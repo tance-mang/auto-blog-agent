@@ -1,0 +1,63 @@
+# Auto Blog Agent
+
+一个面向中文个人技术博客的 Agent Skill 与 Python 自动化程序。支持身份规则、RSS 选题、来源摘录写作、独立 AI 审核、历史去重、预算限制、Markdown 输出和 GitHub 仓库发布。
+
+这是可运行的早期版本。默认关闭发布；当前尚未完成真实模型与真实博客联调，不能视为已验证的无人值守生产系统。
+
+## 快速开始
+
+需要 Python 3.11+。
+
+```bash
+pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python -m autoblog --demo
+```
+
+离线样例位于 generated/demo，不调用模型，不写入真实历史，也永远不会发布。每次重复运行均可重现。
+
+## 配置真实写作
+
+1. 编辑 memory/PROFILE.md 和 EDITORIAL.md。私人素材放 private/INBOX.md，不提交公开仓库。
+2. 修改 config.yaml 中的 feeds、allowed_hosts、keywords、writer_model、reviewer_model。
+3. 在环境变量设置 AI_API_KEY 和 AI_BASE_URL。程序不会自动加载 .env；.env.example 仅为字段说明。
+4. 设置服务商实际价格和每日预算。未提供使用量时仍保留请求前的保守预算预留；失败请求也占预留额度，次日按时区重置。
+5. 执行 `python -m autoblog`，查看 generated/live 下文章和 review.json。
+
+兼容服务必须支持 `/chat/completions`、JSON response_format 和 max_tokens。不同供应商的兼容性需要实测；同一模型可同时担任写作与审核，但审核是单独请求。
+
+## 接入博客
+
+先检查博客仓库的框架、文章目录、Front Matter、分支和构建工作流。不要仅凭项目名称猜测。当前适配器生成通用 YAML Front Matter，需要自行验证主题所需字段。
+
+配置 blog.repository（owner/repo）、branch、posts_path、layout。设置 BLOG_TOKEN，为目标仓库授予 Contents 写入权限。使用专用 PAT 可使提交触发博客原有 push 构建流程；本项目不替博客创建部署流程。先在测试仓库验证，再接真实博客。
+
+确认 Dry Run 后设置 enabled: true，运行 `python -m autoblog --publish`。文件名使用日期和来源 URL 哈希；API 不携带 SHA，因此拒绝覆盖已有文件。不要手动删除发布记录来重试已有文章。
+
+模式：safe 默认，符合全部规则的资料型文章可发布；auto 当前使用同样的硬规则；manual 只保存草稿。个人叙述和代码教程始终保留草稿，当前尚不支持自动创建 PR。
+
+## GitHub Actions
+
+在仓库 Secrets 配置 AI_API_KEY、BLOG_TOKEN；Variables 配置 AI_BASE_URL（不设置则用默认端点）。编辑并提交模型与博客配置后，才开启 enabled。
+
+工作流每小时第 17 分钟唤醒，程序根据 timezone 和 publish_hour 判断是否到期；每日最多发布一篇。支持手动触发。默认 enabled=false，定时运行不会调用付费模型。
+
+状态通过 Actions cache 保存，草稿保留为 7 天 artifact。缓存可能被驱逐，因此它不是可靠永久存储：长期生产使用前应迁移到私有持久状态仓库或对象存储，并实现远端发布对账。当前不要同时运行本地发布和 Actions；工作流 concurrency 只保护工作流内部并发。
+
+## 审核与失败处理
+
+程序检查来源链接、第一人称、部分密钥模式、长度和文本相似度；模型独立检查身份、事实支持、相关性与质量。程序规则属于保守拦截，不能保证识别所有虚构或秘密。来源正文目前使用 RSS 摘录，不抓取和核对完整网页；摘录不足时模型应拒绝。
+
+只重试读取请求，避免模型重复收费。错误输出省略服务商响应正文。生成失败以非零状态结束；审核不通过保存草稿。预算在请求前写入 SQLite。发布成功到历史落库之间仍存在故障窗口；远端已有文件将拒绝覆盖，可能需要人工对账。
+
+## Skill 安装
+
+将仓库完整复制到支持 Agent Skills 的工具技能目录，例如 `~/.codex/skills/auto-blog-agent/` 或 Claude Code 项目 `.claude/skills/auto-blog-agent/`。保留 SKILL.md、程序、配置与 memory 目录；依赖安装到调用工具使用的 Python 环境。其他 AI 工具也可直接阅读 SKILL.md 并运行 CLI，但不能保证所有工具自动识别同一种技能目录。
+
+## 已实现与后续
+
+已实现：端到端离线样例、真实 API 接口、RSS 筛选、独立审核、规则拦截、SQLite 历史、文本去重、预算预留、Markdown、GitHub Contents 发布和调度模板。
+
+待实现：完整网页证据提取与声明核对、语义去重、按比例选题、INBOX 独立选题、持久远端状态与恢复、PR 审核、框架专属适配、周报及封面。未将这些功能包装成已完成能力。
+
+第三方依赖和参考来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。项目使用 MIT 许可证。
