@@ -1,8 +1,16 @@
-# Auto Blog Agent
+# Auto Blog Agent · AI 自动博客运营 Skill
+
+![Tests](https://github.com/tance-mang/auto-blog-agent/actions/workflows/test.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green)
+
+让 AI 记住你的身份，从可信资料发现选题，写作、审核并按规则发布中文技术博客。支持 Codex、Claude Code 等 Agent Skills 工具，也可通过 Python CLI 与 GitHub Actions 独立运行。
+
+**检索关键词：** AI 博客自动化 · AI 自动写作 · Agent Skill · 智能选题 · 中文技术博客 · GitHub Pages · 自动发布
 
 一个面向中文个人技术博客的 Agent Skill 与 Python 自动化程序。支持身份规则、RSS 选题、来源摘录写作、独立 AI 审核、历史去重、预算限制、Markdown 输出和 GitHub 仓库发布。
 
-这是可运行的早期版本。默认关闭发布；当前尚未完成真实模型与真实博客联调，不能视为已验证的无人值守生产系统。
+默认关闭发布。接入真实模型和博客前，请先完成 Dry Run；当前尚未完成真实模型与真实博客联调。
 
 ## 快速开始
 
@@ -61,3 +69,10 @@ python -m autoblog --demo
 待实现：完整网页证据提取与声明核对、语义去重、按比例选题、INBOX 独立选题、持久远端状态与恢复、PR 审核、框架专属适配、周报及封面。未将这些功能包装成已完成能力。
 
 第三方依赖和参考来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。项目使用 MIT 许可证。
+
+
+## 项目与 AI 协作
+
+项目发起与维护：[tance-mang](https://github.com/tance-mang)。
+
+本项目由维护者提出需求并与 **OpenAI Codex** 协作完成架构、代码、测试和文档。AI 协作不代表 OpenAI 官方项目、认证或背书。相关提交使用 `Co-authored-by: Codex <noreply@openai.com>` 标记实际协作。
