@@ -1,0 +1,20 @@
+mode: safe
+timezone: Asia/Shanghai
+publish_hour: 9
+enabled: false
+feeds:
+  - https://github.com/python/cpython/releases.atom
+allowed_hosts: [github.com, docs.python.org, www.python.org]
+keywords: [Python, AI, API, agent, automation]
+writer_model: ''
+reviewer_model: ''
+max_output_tokens: 3000
+daily_token_limit: 30000
+daily_budget_usd: 0.20
+input_usd_per_million: 1.0
+output_usd_per_million: 4.0
+blog:
+  repository: ''
+  branch: main
+  posts_path: ''
+  layout: post

@@ -1,0 +1,43 @@
+name: Auto blog
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: auto-blog
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - uses: actions/cache/restore@v4
+        with:
+          path: state/live
+          key: blog-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: blog-state-
+      - run: python -m unittest discover -s tests -v
+      - run: python -m autoblog --scheduled --publish
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ vars.AI_BASE_URL }}
+          BLOG_TOKEN: ${{ secrets.BLOG_TOKEN }}
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: state/live
+          key: blog-state-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blog-drafts
+          path: generated/live
+          if-no-files-found: ignore
+          retention-days: 7
