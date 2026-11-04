@@ -1,4 +1,6 @@
 mode: safe
+language:
+  content: zh-CN  # Existing Chinese blog; set auto for sample-based onboarding.
 timezone: Asia/Shanghai
 publish_hour: 9
 enabled: false

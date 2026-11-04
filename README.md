@@ -76,3 +76,14 @@ python -m autoblog --demo
 项目发起与维护：[tance-mang](https://github.com/tance-mang)。
 
 本项目由维护者提出需求并与 **OpenAI Codex** 协作完成架构、代码、测试和文档。AI 协作不代表 OpenAI 官方项目、认证或背书。相关提交使用 `Co-authored-by: Codex <noreply@openai.com>` 标记实际协作。
+
+
+## 个人博客定位与语言习惯（0.2.0）
+
+专注个人技术博客，不扩展到社交媒体运营或通用内容平台。版本变化见 [CHANGELOG.md](CHANGELOG.md)，规划见 [ROADMAP.md](ROADMAP.md)。
+
+文章语言按 `--language`、`language.content`、已保存识别结果、用户提供的正文样本依次确定。不使用 IP、地理位置或时区推断语言，交流语言也不自动替代博客语言。现有中文示例配置保留 `zh-CN`；其他用户应配置自己的身份与编辑规则。
+
+设置 `language.content: auto` 后，将纯文章正文放到 `private/language-samples/*.md`（建议使用日期文件名）。首次运行保守识别中文或英文，将依据保存在 `state/live/language.json`；结果不明确时要求配置。改变长期偏好可明确修改配置；重新识别需先备份并移除该记录。
+
+例如：`python -m autoblog --language en`。其他语言允许明确配置，但尚未验证专属审核规则，因此仅生成草稿。固定离线 demo 仍使用中文；真实多语言生成尚未联调。完整博客历史自动导入、网页研究、Draft PR、发布恢复与风格反馈仍为后续任务。
