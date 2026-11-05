@@ -11,4 +11,4 @@ Before connecting an existing blog, inspect its repository, article paths, front
 
 The CLI and GitHub Actions are the execution mechanism; this skill is not a scheduler. Other agents may invoke the same Python CLI. Do not claim factual verification based only on model scores.
 
-Use the Workflow Guardian section in README.md to diagnose failed unattended runs. Treat its findings as hypotheses. Verify the target before replaying a publish operation.
+For GitHub Actions incidents and missed schedules, follow the standalone [Workflow Guardian Skill](https://github.com/tance-mang/workflow-guardian/blob/v1/SKILL.md). This repository uses its Action with the blog rules profile. Verify the target before replaying a publish operation.

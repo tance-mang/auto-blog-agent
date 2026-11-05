@@ -5,7 +5,9 @@ on:
     types: [completed]
 permissions:
   actions: read
-  contents: read
+concurrency:
+  group: guardian-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}
+  cancel-in-progress: false
 jobs:
   diagnose:
     if: >-
@@ -20,24 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: tance-mang/workflow-guardian@161433281586c7463f25efacef189c2ab82ca285 # v1
         with:
-          persist-credentials: false
-      - run: python -m autoblog.guardian
+          profile: blog
+          notify: ${{ vars.GUARDIAN_EMAIL_ENABLED == 'true' && github.event.workflow_run.name != 'Guardian drill' && 'email' || 'none' }}
         env:
           GUARDIAN_AI_KEY: ${{ secrets.GUARDIAN_AI_KEY }}
           GUARDIAN_AI_MODEL: ${{ vars.GUARDIAN_AI_MODEL }}
-          GH_TOKEN: ${{ github.token }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: incident-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}
-          path: incident.md
-          retention-days: 14
-      - name: Send incident email
-        if: vars.GUARDIAN_EMAIL_ENABLED == 'true' && github.event.workflow_run.name != 'Guardian drill'
-        run: python -m autoblog.guardian
-        env:
-          GUARDIAN_SEND_MAIL: '1'
           SMTP_HOST: ${{ secrets.GUARDIAN_SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.GUARDIAN_SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.GUARDIAN_SMTP_PASSWORD }}

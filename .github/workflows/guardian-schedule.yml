@@ -5,34 +5,19 @@ on:
   workflow_dispatch:
 permissions:
   actions: read
-  contents: read
 jobs:
   check:
     if: vars.GUARDIAN_WATCH_WORKFLOW != ''
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: tance-mang/workflow-guardian@161433281586c7463f25efacef189c2ab82ca285 # v1
         with:
-          persist-credentials: false
-      - run: python -m autoblog.guardian_schedule
-        id: check
+          mode: schedule
+          watch-workflow: ${{ vars.GUARDIAN_WATCH_WORKFLOW }}
+          max-age-minutes: ${{ vars.GUARDIAN_MAX_AGE_MINUTES || '180' }}
+          notify: ${{ vars.GUARDIAN_EMAIL_ENABLED == 'true' && 'email' || 'none' }}
         env:
-          GH_TOKEN: ${{ github.token }}
-          GUARDIAN_WATCH_WORKFLOW: ${{ vars.GUARDIAN_WATCH_WORKFLOW }}
-          GUARDIAN_MAX_AGE_MINUTES: ${{ vars.GUARDIAN_MAX_AGE_MINUTES }}
-          GUARDIAN_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-      - uses: actions/upload-artifact@v4
-        if: steps.check.outputs.missed == 'true'
-        with:
-          name: missed-schedule
-          path: incident.md
-          retention-days: 14
-      - name: Send missed schedule email
-        if: steps.check.outputs.missed == 'true' && vars.GUARDIAN_EMAIL_ENABLED == 'true'
-        run: python -m autoblog.guardian
-        env:
-          GUARDIAN_SEND_MAIL: '1'
           SMTP_HOST: ${{ secrets.GUARDIAN_SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.GUARDIAN_SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.GUARDIAN_SMTP_PASSWORD }}
