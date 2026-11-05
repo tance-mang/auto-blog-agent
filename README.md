@@ -87,3 +87,23 @@ python -m autoblog --demo
 设置 `language.content: auto` 后，将纯文章正文放到 `private/language-samples/*.md`（建议使用日期文件名）。首次运行保守识别中文或英文，将依据保存在 `state/live/language.json`；结果不明确时要求配置。改变长期偏好可明确修改配置；重新识别需先备份并移除该记录。
 
 例如：`python -m autoblog --language en`。其他语言允许明确配置，但尚未验证专属审核规则，因此仅生成草稿。固定离线 demo 仍使用中文；真实多语言生成尚未联调。完整博客历史自动导入、网页研究、Draft PR、发布恢复与风格反馈仍为后续任务。
+
+## 无人值守故障诊断 · Workflow Guardian
+
+博客发布是第一个接入场景。同样的方式可监测视频发布、定时数据同步等 GitHub Actions 任务。在目标仓库复制诊断工作流和脚本，再把 `workflows` 改成要监测的工作流名称。
+
+**运行结束 → 独立监测 → 规则诊断 → 报告与可选邮件**
+
+- 正常运行无需报告。失败、启动异常、超时和取消等结果进入诊断。
+- 报告记录运行次数、可追溯的运行链接、初步判断、影响范围和处理建议。日志缺失或规则未命中时保留不确定性。
+- 在监测运行的 Summary 和 Artifacts 查看 Markdown 报告。报告仅包含预设诊断文案和运行元数据。
+- 邮件默认关闭。配置仓库 Actions Secrets `GUARDIAN_SMTP_HOST`、`GUARDIAN_SMTP_USERNAME`、`GUARDIAN_SMTP_PASSWORD`、`GUARDIAN_SMTP_FROM`、`GUARDIAN_SMTP_TO`，再将 Actions Variable `GUARDIAN_EMAIL_ENABLED` 设为 `true`。发送端需支持 SMTP 隐式 TLS 465。收件地址与公开合作渠道独立。
+- 诊断工作流只读，不会自动重跑、修改配置或发布内容。重跑前核对目标站点已有结果。没触发的定时任务不会产生完成事件，漏跑检测仍待接入。
+
+### 自测与公开试用
+
+本地执行 `python -m unittest discover -s tests -v`，11 项通过，包含故障分类、日志缺失和超时报告。也可在 Actions 手动运行 **Guardian drill** 注入故障。该演练不发布文章，也不发邮件。
+
+项目以 MIT 许可面向全国开发者和自动化使用者开放试用。欢迎带着脱敏的复现步骤、预期行为、实际影响和修复建议到 [GitHub Issues](https://github.com/tance-mang/auto-blog-agent/issues) 交流。项目由 tance-mang 发起，OpenAI Codex 协作实现与验证。
+
+后续计划为复杂故障增加可选 AI 分析，并用第二个自动化场景验证通用性。

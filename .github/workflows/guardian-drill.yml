@@ -1,0 +1,11 @@
+name: Guardian drill
+on: workflow_dispatch
+permissions: {}
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inject controlled failure
+        run: |
+          echo GUARDIAN_DRILL
+          exit 1

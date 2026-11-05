@@ -10,3 +10,5 @@ Use `python -m autoblog --demo` for an offline dry run, then `python -m autoblog
 Before connecting an existing blog, inspect its repository, article paths, front matter and build workflow. Do not overwrite existing articles. No source or no suitable topic means skip. Personal experiences must be traceable to user material; do not invent opinions, credentials or results. Generated code is not validated merely because a model reviewed it; tutorials requiring execution stay drafts.
 
 The CLI and GitHub Actions are the execution mechanism; this skill is not a scheduler. Other agents may invoke the same Python CLI. Do not claim factual verification based only on model scores.
+
+Use the Workflow Guardian section in README.md to diagnose failed unattended runs. Treat its findings as hypotheses. Verify the target before replaying a publish operation.
