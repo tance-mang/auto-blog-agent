@@ -107,3 +107,5 @@ python -m autoblog --demo
 项目以 MIT 许可面向全国开发者和自动化使用者开放试用。欢迎带着脱敏的复现步骤、预期行为、实际影响和修复建议到 [GitHub Issues](https://github.com/tance-mang/auto-blog-agent/issues) 交流。项目由 tance-mang 发起，OpenAI Codex 协作实现与验证。
 
 后续计划为复杂故障增加可选 AI 分析，并用第二个自动化场景验证通用性。
+
+合作与试用联系：[QQ 邮箱](mailto:2123759705@qq.com) · [Gmail](mailto:tance.hub@gmail.com)。
