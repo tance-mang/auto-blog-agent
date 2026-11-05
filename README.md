@@ -109,3 +109,5 @@ python -m autoblog --demo
 后续计划为复杂故障增加可选 AI 分析，并用第二个自动化场景验证通用性。
 
 合作与试用联系：[QQ 邮箱](mailto:2123759705@qq.com) · [Gmail](mailto:tance.hub@gmail.com)。
+
+2026-11-05 线上故障演练：[注入故障](https://github.com/tance-mang/auto-blog-agent/actions/runs/42051427397) 按预期失败，[独立监测](https://github.com/tance-mang/auto-blog-agent/actions/runs/42051460253) 成功。已下载并检查 Markdown 产物，规则命中 `simulation`，报告包含原运行和尝试次数。SMTP 实际投递尚未验证。
