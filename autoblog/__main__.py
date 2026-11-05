@@ -18,6 +18,7 @@ from zoneinfo import ZoneInfo
 import feedparser
 import yaml
 from .language import resolve
+from .html_publish import publish_html
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -189,7 +190,13 @@ def run():
     if args.publish and not args.demo and status == 'ready':
         if not cfg['enabled']:
             raise ValueError('Set enabled=true after deployment dry run')
-        publish(cfg, name, content)
+        if cfg['blog'].get('format') == 'tance-html':
+            token = os.environ.get('BLOG_TOKEN')
+            if not token:
+                raise ValueError('BLOG_TOKEN is required')
+            publish_html(cfg['blog'], day, article, request, token)
+        else:
+            publish(cfg, name, content)
         status = 'published'
     if not args.demo:
         db.execute('INSERT OR REPLACE INTO articles VALUES (?,?,?,?,?)', (ident, article['title'], article['body'], status, day))

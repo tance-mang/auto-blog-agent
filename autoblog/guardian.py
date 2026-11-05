@@ -7,11 +7,13 @@ import ssl
 import subprocess
 from email.message import EmailMessage
 from pathlib import Path
+from .guardian_ai import suggestion
 
 RULES = (
     ("simulation", r"GUARDIAN_DRILL", "演练注入了预期故障", "确认报告产物存在，无需重跑发布。"),
     ("configuration", r"\b(?:BLOG_TOKEN|AI_API_KEY) is required\b", "缺少配置凭据", "检查对应仓库 Secret，确认后再重跑。"),
     ("github_permission", r"Resource not accessible by integration|Write access to repository not granted", "GitHub 拒绝写入", "核对目标仓库、令牌的 Contents 写权限和分支规则。"),
+    ("model_configuration", r"Configure AI_API_KEY and writer_model/reviewer_model", "模型配置不完整", "核对模型名称和 Actions 凭据。"),
     ("rate_limit", r"HTTP(?: Error)? 429\b|rate_limit_exceeded", "服务疑似限流", "查看服务配额和重试间隔，确认后再重跑。"),
     ("network", r"TimeoutError|timed out|Temporary failure in name resolution", "网络请求或任务疑似超时", "检查服务状态和网络，再决定是否重跑。"),
 )
@@ -78,6 +80,11 @@ def main():
     except subprocess.TimeoutExpired:
         logs = ""
     body = report(repo, run, logs, bool(logs.strip()))
+    if diagnose(run["conclusion"], logs)[0] == "unknown":
+        extra = suggestion(run["conclusion"], logs)
+        if extra:
+            text = re.sub(r"[^\w\s，。；：、？！（）-]", " ", extra)
+            body += f"\n**AI 排查建议（待验证）**　{text}\n"
     Path("incident.md").write_text(body, encoding="utf-8")
     with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
         summary.write(body)

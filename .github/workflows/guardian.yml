@@ -25,6 +25,8 @@ jobs:
           persist-credentials: false
       - run: python -m autoblog.guardian
         env:
+          GUARDIAN_AI_KEY: ${{ secrets.GUARDIAN_AI_KEY }}
+          GUARDIAN_AI_MODEL: ${{ vars.GUARDIAN_AI_MODEL }}
           GH_TOKEN: ${{ github.token }}
       - uses: actions/upload-artifact@v4
         with:

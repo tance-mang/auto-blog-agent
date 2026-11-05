@@ -98,7 +98,7 @@ python -m autoblog --demo
 - 报告记录运行次数、可追溯的运行链接、初步判断、影响范围和处理建议。日志缺失或规则未命中时保留不确定性。
 - 在监测运行的 Summary 和 Artifacts 查看 Markdown 报告。报告仅包含预设诊断文案和运行元数据。
 - 邮件默认关闭。配置仓库 Actions Secrets `GUARDIAN_SMTP_HOST`、`GUARDIAN_SMTP_USERNAME`、`GUARDIAN_SMTP_PASSWORD`、`GUARDIAN_SMTP_FROM`、`GUARDIAN_SMTP_TO`，再将 Actions Variable `GUARDIAN_EMAIL_ENABLED` 设为 `true`。发送端需支持 SMTP 隐式 TLS 465。收件地址与公开合作渠道独立。
-- 诊断工作流只读，不会自动重跑、修改配置或发布内容。重跑前核对目标站点已有结果。没触发的定时任务不会产生完成事件，漏跑检测仍待接入。
+- 诊断工作流只读，不会自动重跑、修改配置或发布内容。重跑前核对目标站点已有结果。未触发的定时任务由单独的漏跑检查处理。
 
 ### 自测与公开试用
 
@@ -106,8 +106,18 @@ python -m autoblog --demo
 
 项目以 MIT 许可面向全国开发者和自动化使用者开放试用。欢迎带着脱敏的复现步骤、预期行为、实际影响和修复建议到 [GitHub Issues](https://github.com/tance-mang/auto-blog-agent/issues) 交流。项目由 tance-mang 发起，OpenAI Codex 协作实现与验证。
 
-后续计划为复杂故障增加可选 AI 分析，并用第二个自动化场景验证通用性。
+后续计划用第二个真实自动化场景验证通用性。
 
 合作与试用联系：[QQ 邮箱](mailto:2123759705@qq.com) · [Gmail](mailto:tance.hub@gmail.com)。
 
 2026-11-05 线上故障演练：[注入故障](https://github.com/tance-mang/auto-blog-agent/actions/runs/42051427397) 按预期失败，[独立监测](https://github.com/tance-mang/auto-blog-agent/actions/runs/42051460253) 成功。已下载并检查 Markdown 产物，规则命中 `simulation`，报告包含原运行和尝试次数。SMTP 实际投递尚未验证。
+
+### 可选部署能力
+
+| 功能 | 如何启用 |
+| --- | --- |
+| AI 排查建议 | 设置 Actions Secret `GUARDIAN_AI_KEY` 和 Variable `GUARDIAN_AI_MODEL`。只有规则未命中时调用。模型仅收到状态和允许的症状类别，服务不可用时保留原报告。 |
+| 漏跑检查 | 设置 Actions Variable `GUARDIAN_WATCH_WORKFLOW`（如 `auto-blog.yml`）和 `GUARDIAN_MAX_AGE_MINUTES`（默认 180）。检查器每三小时运行一次，持续漏跑可重复报告。监测本身也依赖 GitHub 调度。 |
+| TANCE HTML 发布 | 在 `config.yaml` 的 `blog` 下设置 `format: tance-html`、`section: create` 或 `observe`、目标 `repository` 和 `branch`。站点需有 `_template-post.html`、栏目页和归档页。正文以转义后的文本段落输出。文章和导航在同一次提交写入，同栏目同日只写一个固定路径，分支并发冲突时安全退出。 |
+
+默认配置保持试用模式。真实发布需要配置写作及审核模型、Actions Secret `AI_API_KEY` 和具备目标仓库 Contents 写权限的 `BLOG_TOKEN`，并在验证后启用 `enabled`。2026-11-05 扩展自测增加了 HTML 单次提交和同日去重、AI 输入脱敏、UTC 漏跑判断。凭据联调与真实告警投递需要部署方配置。
