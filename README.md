@@ -101,3 +101,5 @@ Auto Blog Agent 负责写作、审核和发布，也是独立开源项目 [Workf
 在 `config.yaml` 的 `blog` 下设置 `format: tance-html`、`section: create` 或 `observe`、目标 `repository` 和 `branch`。站点需有 `_template-post.html`、栏目页和归档页。文章与导航写入同一次提交，同栏目同日使用固定路径。真实发布需要写作及审核模型、`AI_API_KEY` 和具备目标仓库 Contents 写权限的 `BLOG_TOKEN`，并设置 `enabled`。
 
 项目采用 MIT 许可，由 tance-mang 发起，OpenAI Codex 协作实现与验证。[GitHub Issues](https://github.com/tance-mang/auto-blog-agent/issues) · [QQ 邮箱](mailto:2123759705@qq.com) · [Gmail](mailto:tance.hub@gmail.com)
+
+测试范围与博客同步规则见 [测试与手动验证](docs/TESTING.md)。
