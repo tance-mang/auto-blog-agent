@@ -1,0 +1,25 @@
+{
+  "project": "feed-tools",
+  "date": "2026-11-02",
+  "notice": "Format sample only. Not a personal log and not a blog post.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Problem: 解析器遇到空 feed 时会跳过该条目，避免写入空白摘要。"
+    },
+    {
+      "role": "assistant",
+      "content": "Decision: 保留跳过行为，并把依据写进 changelog。"
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "changelog",
+      "text": "解析器遇到空 feed 时会跳过该条目，避免写入空白摘要。保留跳过行为，并把依据写进 changelog。详见 https://docs.python.org/3/library/html.parser.html"
+    },
+    {
+      "kind": "url",
+      "url": "https://evil.example/not-allowed"
+    }
+  ]
+}

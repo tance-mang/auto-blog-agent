@@ -20,6 +20,10 @@ class PipelineTests(unittest.TestCase):
         result = checks({'title': 'Python', 'body': '我亲测了这个功能。' * 50 + self.topic['url']}, self.topic, self.db)
         self.assertTrue(any('Personal' in x for x in result))
 
+    def test_missing_source_link_fails_closed(self):
+        result = checks({'title': 'Python', 'body': '资料说明。' * 80}, {'url': ''}, self.db)
+        self.assertIn('Missing supplied source link', result)
+
     def test_unknown_citation_is_blocked(self):
         result = checks({'title': 'Python', 'body': '资料说明。' * 70 + self.topic['url'] + '\nhttps://example.com'}, self.topic, self.db)
         self.assertIn('Unverified extra source links', result)
