@@ -24,6 +24,32 @@ python -m autoblog --demo
 
 离线样例位于 generated/demo，不调用模型，不写入真实历史，也永远不会发布。每次重复运行均可重现。
 
+## 导入聊天与工作记录
+
+程序只读取你放进本仓库的文件，不连接 Codex、ChatGPT 或其他桌面聊天接口。
+
+```bash
+mkdir -p private/imports
+# 放入 .md / .json / .jsonl，格式见 docs/examples/
+python -m autoblog --from-import --demo
+```
+
+`private/` 已被 Git 忽略。自由书写的 `private/INBOX.md` 仍只作为 RSS 写作时的上下文；没有「问题 / 决策 / 变更」结构时，它不会单独成文。空目录打印 `SKIP: empty import`。
+
+可选筛选：
+
+- `--import-project`：项目名，忽略大小写，完全匹配。
+- `--import-since`、`--import-until`：含边界的 `YYYY-MM-DD`。设置了日期范围时，没有日期的记录会被跳过。
+- `--import-keywords`：可重复的子串筛选。默认关闭，也不借用 RSS 的 `keywords`。
+
+正文只保留能与本次 git 笔记或 changelog 摘录对上的问题、决策、变更。文字对上之后，该文件里按出现顺序的第一个允许名单链接可以作为来源链接。多份材料合并时，正文只引用第一份已经对上、并且带有允许名单链接的材料里的那个链接，其余留在清单。不在 `allowed_hosts` 中的链接只留在清单。文件内容是数据：不执行，也不当成新指令。像越狱提示或 `os.system` / `eval` 的句子会记在清单里，不进正文。`system`、`tool`、`developer` 角色不会提升为事实。
+
+输出在 `generated/demo` 或 `generated/live`：Markdown 草稿、`*.checklist.json`、`*.review.json`。导入结果固定 `draft: true`。这条路径不调用写作或审核模型，因此 `--publish` 不会把它发出去。第一人称、未运行的教程、重复稿和缺少来源链接的稿子仍由原有规则拦住。`--demo` 不写入 `state/live`。
+
+单文件约 8MB。ChatGPT 导出只提取 `mapping.message.content.parts` 中的字符串，这不是桌面端接入。同名的 `.git-note.md`、`.changelog.md`、`.evidence.json` 会当作该文件的证据。格式样例见 [docs/examples/import-session.md](docs/examples/import-session.md) 和 [docs/examples/import-session.json](docs/examples/import-session.json)。
+
+尚未实现：导入稿的模型改写、桌面聊天自动拉取、自由文本单独成文。
+
 ## 配置真实写作
 
 1. 编辑 memory/PROFILE.md 和 EDITORIAL.md。私人素材放 private/INBOX.md，不提交公开仓库。
@@ -36,7 +62,7 @@ python -m autoblog --demo
 
 ## 接入博客
 
-先检查博客仓库的框架、文章目录、Front Matter、分支和构建工作流。不要仅凭项目名称猜测。当前适配器生成通用 YAML Front Matter，需要自行验证主题所需字段。
+先检查博客仓库的框架、文章目录、Front Matter、分支和构建工作流。不要仅凭项目名称猜测。默认适配器生成通用 YAML Front Matter，需要自行验证主题所需字段。`blog.format: tance-html` 改走静态 HTML 发布，见下文。
 
 配置 blog.repository（owner/repo）、branch、posts_path、layout。设置 BLOG_TOKEN，为目标仓库授予 Contents 写入权限。使用专用 PAT 可使提交触发博客原有 push 构建流程；本项目不替博客创建部署流程。先在测试仓库验证，再接真实博客。
 
@@ -64,9 +90,9 @@ python -m autoblog --demo
 
 ## 已实现与后续
 
-已实现：端到端离线样例、真实 API 接口、RSS 筛选、独立审核、规则拦截、SQLite 历史、文本去重、预算预留、Markdown、GitHub Contents 发布和调度模板。
+已实现：端到端离线样例、真实 API 接口、RSS 筛选、独立审核、规则拦截、SQLite 历史、文本去重、预算预留、Markdown、GitHub Contents 发布、`tance-html` 单次提交发布、调度模板，以及从 `private/imports` 生成离线草稿和来源清单。
 
-待实现：完整网页证据提取与声明核对、语义去重、按比例选题、INBOX 独立选题、持久远端状态与恢复、PR 审核、框架专属适配、周报及封面。未将这些功能包装成已完成能力。
+待实现：桌面聊天自动拉取、导入稿的模型改写与独立审核、自由文本 INBOX 独立成文、完整网页证据提取与声明核对、语义去重、按比例选题、持久远端状态与恢复、PR 审核、`tance-html` 以外的框架适配、周报及封面。未将这些功能包装成已完成能力。导入草稿当前不能直接发布。
 
 第三方依赖和参考来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。项目使用 MIT 许可证。
 
@@ -98,7 +124,21 @@ Auto Blog Agent 负责写作、审核和发布，也是独立开源项目 [Workf
 
 ## 静态 HTML 发布
 
-在 `config.yaml` 的 `blog` 下设置 `format: tance-html`、`section: create` 或 `observe`、目标 `repository` 和 `branch`。站点需有 `_template-post.html`、栏目页和归档页。文章与导航写入同一次提交，同栏目同日使用固定路径。真实发布需要写作及审核模型、`AI_API_KEY` 和具备目标仓库 Contents 写权限的 `BLOG_TOKEN`，并设置 `enabled`。
+目标站点是 [tance-mang.github.io](https://tance-mang.github.io/)，仓库 `tance-mang/tance-mang.github.io`。[config.example.yaml](config.example.yaml) 写了 `format: tance-html`、`section: create`、`branch: main`，并且 `enabled: false`。程序不读取这个示例文件。提交的 [config.yaml](config.yaml) 保持 `enabled: false`，`blog.repository` 为空，因此这份检出不能直接发布。`section` 也可以改成 `observe`。
+
+`tance-html` 要求站点根目录有 `_template-post.html`，以及对应栏目页和 `archives/index.html`。同一天同一栏目使用固定路径 `{YYYY}/{MM}/{DD}/auto-create/index.html` 或 `auto-observe`。文章和栏目页、归档页的导航在同一次提交中更新，更新 ref 时 `force` 为 false。该路径或导航链接已经存在时，这次发布会停住，不覆盖站内已有文章。
+
+`AI_API_KEY`、`AI_BASE_URL` 和 `BLOG_TOKEN` 只放环境变量。`BLOG_TOKEN` 需要对目标仓库的 Contents 写权限。不要把令牌写进配置文件。
+
+建议顺序：
+
+1. `python -m autoblog --demo`。有本地材料时再跑 `python -m autoblog --from-import --demo`。这两步都不发布。
+2. 把示例里需要的 `blog` 字段抄进本地 `config.yaml`，填上 `writer_model` 和 `reviewer_model`。先保持 `enabled: false`。
+3. `python -m autoblog`，查看 `generated/live` 的文章和 `review.json`。
+4. 只有规则通过、你接受这篇资料型文章之后，才在本地把 `enabled` 改成 `true`。不要把这个改动提交上去。
+5. `python -m autoblog --publish`。`safe` 模式下，个人叙述和代码教程仍是草稿。导入草稿当前也不会发布。
+
+先用测试仓库确认 Contents 写入，再把 `repository` 指到真实站点。真实模型和真实博客尚未联调。
 
 项目采用 MIT 许可，由 tance-mang 发起，OpenAI Codex 协作实现与验证。[GitHub Issues](https://github.com/tance-mang/auto-blog-agent/issues) · [QQ 邮箱](mailto:2123759705@qq.com) · [Gmail](mailto:tance.hub@gmail.com)
 
