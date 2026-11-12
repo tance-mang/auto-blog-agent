@@ -15,7 +15,14 @@ daily_token_limit: 30000
 daily_budget_usd: 0.20
 input_usd_per_million: 1.0
 output_usd_per_million: 4.0
+imports:
+  path: private/imports
+  project: ''
+  since: ''
+  until: ''
+  keywords: []
 blog:
+  # Owner site sample: config.example.yaml. This checkout stays unpublished.
   repository: ''
   branch: main
   posts_path: ''
