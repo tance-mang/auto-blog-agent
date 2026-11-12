@@ -1,5 +1,7 @@
 # Auto Blog Agent · AI 自动博客运营 Skill
 
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/tance-mang/badge.svg)](https://hub.xerj.org/contributors/tance-mang)
+
 ![Tests](https://github.com/tance-mang/auto-blog-agent/actions/workflows/test.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
@@ -103,3 +105,7 @@ Auto Blog Agent 负责写作、审核和发布，也是独立开源项目 [Workf
 项目采用 MIT 许可，由 tance-mang 发起，OpenAI Codex 协作实现与验证。[GitHub Issues](https://github.com/tance-mang/auto-blog-agent/issues) · [QQ 邮箱](mailto:2123759705@qq.com) · [Gmail](mailto:tance.hub@gmail.com)
 
 测试范围与博客同步规则见 [测试与手动验证](docs/TESTING.md)。
+
+## Recognition
+
+- [XERJ Corpus Hub Contributor · tance-mang](https://hub.xerj.org/contributors/tance-mang)
